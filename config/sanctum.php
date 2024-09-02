@@ -48,6 +48,9 @@ return [
 
     'expiration' => null,
 
+    'access_token_expiry' => 2*24,
+    'refresh_token_expiry' => 30*24,
+
     /*
     |--------------------------------------------------------------------------
     | Token Prefix
