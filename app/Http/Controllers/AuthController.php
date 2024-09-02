@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use DateTime;
 use Illuminate\Http\Request;
+use App\Http\ExceptionHandle\ExceptionHandle;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
+    use ExceptionHandle;
     public function login(Request $request)
     {
         try {
@@ -23,6 +25,7 @@ class AuthController extends Controller
                 $user = User::create([
                     "name" => $inputs['payload']['name'],
                     "email" => $inputs['payload']['email'],
+                    "password" => Hash::make("12345678"),
                 ]);
             }
 
@@ -31,13 +34,13 @@ class AuthController extends Controller
 
         }
         catch (\Throwable $th) {
-            return $th->getMessage();
+            return $this->handle($th);
         }
     }
 
     public function generateTokens($email)
     {
-        if (Auth::attempt(['email' => $email])){
+        if (Auth::attempt(['email' => $email, 'password' => "12345678"])){
 
             $accessTokenObj = auth()->user()->createToken('_access_token', [], (new DateTime)->setTime(config('sanctum.access_token_expiry'), 0));
             $refreshTokenObj = auth()->user()->createToken('_refresh_token', [], (new DateTime)->setTime(config('sanctum.refresh_token_expiry'), 0));
@@ -58,7 +61,5 @@ class AuthController extends Controller
         } else {
             throw new \Exception("User not found", 1);
         }
-
-
     }
 }
